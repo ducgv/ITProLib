@@ -227,6 +227,8 @@ public abstract class ProcessingThread implements Runnable {
 		long lastTime=System.currentTimeMillis();
 		long currentTime=System.currentTimeMillis();
 		//end of ducgv add	
+		
+		
 		while (keepProcessing) {
 			needToSleep = true;
 			try{
@@ -246,8 +248,9 @@ public abstract class ProcessingThread implements Runnable {
 			if(currentTime-lastTime>=heartBeatInterval){
 				lastTime=currentTime;
 				try{
-					if(keepProcessing)
+					if(keepProcessing){
 						OnHeartBeat();
+					}
 				}catch(Exception e){
 					if(logger!=null){
 						//e.printStackTrace();

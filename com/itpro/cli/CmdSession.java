@@ -50,7 +50,7 @@ public class CmdSession extends ProcessingThread {
 	public void OnHeartBeat() {
 		// TODO Auto-generated method stub
 		if (request != null) {
-			request.result = resultTimeoutError;
+			request.result = new Hashtable<String, String>(resultTimeoutError);
 			try {
 				connection.send((request.getRespString()+"\n").getBytes());
 				logInfo("-> " + connection.address + "/" + connection.port + ": result:"+ request.result);
@@ -63,7 +63,7 @@ public class CmdSession extends ProcessingThread {
 		}
 		else{
 			request = new CmdRequest();
-			request.result = resultTimeoutError;
+			request.result = new Hashtable<String, String>(resultTimeoutError);
 			try {
 				connection.send((request.getRespString()+"\n").getBytes());
 				logInfo("-> " + connection.address + "/" + connection.port + ": result:"+ request.result);
@@ -136,7 +136,7 @@ public class CmdSession extends ProcessingThread {
 			csReceived=csReceived.replaceAll("\n", "");
 			int pos = csReceived.indexOf(":");
 			if(pos<=0){
-				request.result = resultSyntaxError;
+				request.result = new Hashtable<String, String>(resultSyntaxError);
 				request.cmd = csReceived.trim();
 				
 			}
@@ -160,7 +160,7 @@ public class CmdSession extends ProcessingThread {
 
 		}
 		else {
-			request.result = resultSyntaxError;
+			request.result = new Hashtable<String, String>(resultSyntaxError);
 			try {
 				connection.send((request.getRespString()+"\n").getBytes());
 				logInfo("-> " + connection.address + "/" + connection.port + ": result:"+ request.result);
