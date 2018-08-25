@@ -21,12 +21,25 @@ import com.itpro.util.Queue;
 public class CliCmd {
 	public static final int RESP_FORMAT_TYPE_HASH = 1;
 	public static final int RESP_FORMAT_TYPE_JSON = 2;
-	public Queue queueResp;
+	private Queue queueResp;
 	public String cmd = "";
-	public int respFormatType = RESP_FORMAT_TYPE_HASH;
+	private int respFormatType = RESP_FORMAT_TYPE_HASH;
+	public int getRespFormatType() {
+		return respFormatType;
+	}
+
+	public void setRespFormatType(int respFormatType) {
+		this.respFormatType = respFormatType;
+	}
+
 	public Hashtable<String, String> reqParams = new Hashtable<String, String>();
 	private JsonObject respParams = null;
 	private JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
+	
+	public CliCmd(Queue queueResp) {
+		// TODO Auto-generated constructor stub
+		this.queueResp = queueResp;
+	}
 	
 	public JsonObjectBuilder getJsonObjectBuilder(){
 		return jsonObjectBuilder;
@@ -34,6 +47,10 @@ public class CliCmd {
 	
 	public void apply(){
 		respParams = jsonObjectBuilder.build();
+	}
+	
+	public void doResponse(){
+		queueResp.enqueue(this);
 	}
 	
 	public String toString(){
@@ -49,6 +66,10 @@ public class CliCmd {
 			sParam=sParam.substring(1);
 		sResult+=sParam;
 		return sResult;
+	}
+	
+	public String getReqParam(String param){
+		return reqParams.get(param);
 	}
 	
 	public void setRespParams(JsonObject respParams){

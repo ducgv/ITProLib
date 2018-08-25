@@ -70,7 +70,7 @@ public class CliCmdSession extends ProcessingThread {
 			Terminate();
 		}
 		else{
-			request = new CliCmd();
+			request = new CliCmd(queueResp);
 			request.setRespParams(timeoutRespParams);
 			try {
 				connection.send((request.getRespString()+"\n").getBytes());
@@ -130,9 +130,9 @@ public class CliCmdSession extends ProcessingThread {
 	
 	public void OnCmdRequest(){
 		if(request.reqParams.containsKey("CliRespFormatType")){
-			String cmdRespFormat = request.reqParams.get("CLIRespFormatType");
-			if(cmdRespFormat!=null&&cmdRespFormat.equalsIgnoreCase("JSON")){
-				request.respFormatType = CliCmd.RESP_FORMAT_TYPE_JSON;
+			String CliRespFormatType = request.reqParams.get("CliRespFormatType");
+			if(CliRespFormatType!=null&&CliRespFormatType.equalsIgnoreCase("JSON")){
+				request.setRespFormatType(CliCmd.RESP_FORMAT_TYPE_JSON);
 			}
 		}
 		if(request.reqParams.containsKey("CliTimeout")){
@@ -140,23 +140,15 @@ public class CliCmdSession extends ProcessingThread {
 			if(cliTimeout!=null&&!cliTimeout.equals("")){
 				try{
 					int timeout = Integer.parseInt(cliTimeout);
-					if(timeout>=1){
-						setHeartBeatInterval(timeout*1000);
-					}
+					setHeartBeatInterval(timeout*1000);
 				}
 				catch(NumberFormatException e){
-					logWarning(request.toString()+"; warning: invalid CliTimeout value, ignore this parameter");
+					logWarning(request.toString()+": Invalid CliTimeout value, ignore this parameter");
 				}
 
 			}
 		}
-		if(request.reqParams.containsKey("RespFormatType")){
-			String cmdRespFormat = request.reqParams.get("RespFormatType");
-			if(cmdRespFormat!=null&&cmdRespFormat.equalsIgnoreCase("JSON")){
-				request.respFormatType = CliCmd.RESP_FORMAT_TYPE_JSON;
-			}
-		}
-		logInfo("<- " + connection.address + "/" + connection.port + ": cmd:"+ request.cmd+"; param:"+ request.reqParams);
+		logInfo("<- " + connection.address + "/" + connection.port + ": cmd:"+ request.cmd+"; params:"+ request.reqParams);
 		if(queueReq!=null){
 			queueReq.enqueue(request);
 		}		
@@ -164,9 +156,8 @@ public class CliCmdSession extends ProcessingThread {
 	
 	public void OnReceive(ByteBuffer buffer){
 		String csReceived = new String(buffer.getBuffer());
-		request = new CliCmd();
-		request.respFormatType = defaultRespFormatType;
-		request.queueResp = queueResp;
+		request = new CliCmd(queueResp);
+		request.setRespFormatType(defaultRespFormatType);
 		if(csReceived!=null&&(!csReceived.equals(""))){				
 			csReceived=csReceived.replaceAll("\r\n", "");
 			csReceived=csReceived.replaceAll("\n", "");
