@@ -4,7 +4,7 @@
 package com.itpro.cli;
 
 import java.io.IOException;
-import java.util.Hashtable;
+import javax.json.JsonObject;
 import com.itpro.util.ProcessingThread;
 import com.itpro.util.Queue;
 import com.itpro.util.TCPConnection;
@@ -20,16 +20,20 @@ public class CmdSession extends ProcessingThread {
 	private Queue queueReq = null;
 	private boolean isReceived = false;
 	private boolean needToTerminate = false;
+	/*
 	private Hashtable<String, String> resultTimeoutError;
 	private Hashtable<String, String> resultSyntaxError;
+	*/
+	private JsonObject timeoutRespParams;
+	private JsonObject syntaxErrorRespParams;
+	private int respFormatType;
 	
-	
-	public void setTimeoutErrorParam(Hashtable<String, String> resultTimeoutError){
-		this.resultTimeoutError = resultTimeoutError;
+	public void setTimeoutRespParams(JsonObject timeoutRespParams){
+		this.timeoutRespParams = timeoutRespParams;
 	}
 	
-	public void setSyntaxErrorParam(Hashtable<String, String> resultSyntaxError){
-		this.resultSyntaxError = resultTimeoutError;
+	public void setSyntaxErrorRespParams(JsonObject syntaxErrorRespParams){
+		this.syntaxErrorRespParams = syntaxErrorRespParams;
 	}
 	
 	public void setQueueReq(Queue queue){
@@ -43,6 +47,10 @@ public class CmdSession extends ProcessingThread {
 		connection.nReceiveTimeout = 1000;		
 	}
 	
+	JsonObject parseErrorParamsString(String errorParramsString){
+		return null;
+	}
+	
 	/* (non-Javadoc)
 	 * @see com.logica.smpp.util.ProcessingThread#OnHeartBeat()
 	 */
@@ -50,27 +58,27 @@ public class CmdSession extends ProcessingThread {
 	public void OnHeartBeat() {
 		// TODO Auto-generated method stub
 		if (request != null) {
-			request.result = new Hashtable<String, String>(resultTimeoutError);
+			request.setRespParams(timeoutRespParams);
 			try {
 				connection.send((request.getRespString()+"\n").getBytes());
-				logInfo("-> " + connection.address + "/" + connection.port + ": result:"+ request.result);
+				logInfo("-> " + connection.address + "/" + connection.port + ": result:"+ request.getRespString());
 			}catch (IOException e) {
 				// TODO Auto-generated catch block					
 				//					e.printStackTrace();
-				logError("-> " + connection.address + "/" + connection.port + ": result:"+ request.result+"; error:"+e.getMessage());
+				logError("-> " + connection.address + "/" + connection.port + ": result:"+ request.getRespString()+"; error:"+e.getMessage());
 			}
 			Terminate();
 		}
 		else{
 			request = new CmdRequest();
-			request.result = new Hashtable<String, String>(resultTimeoutError);
+			request.setRespParams(timeoutRespParams);
 			try {
 				connection.send((request.getRespString()+"\n").getBytes());
-				logInfo("-> " + connection.address + "/" + connection.port + ": result:"+ request.result);
+				logInfo("-> " + connection.address + "/" + connection.port + ": result:"+ request.getRespString());
 			}catch (IOException e) {
 				// TODO Auto-generated catch block					
 				//					e.printStackTrace();
-				logError("-> " + connection.address + "/" + connection.port + ": result:"+ request.result+"; error:"+e.getMessage());
+				logError("-> " + connection.address + "/" + connection.port + ": result:"+ request.getRespString()+"; error:"+e.getMessage());
 			}
 			Terminate();
 		}
@@ -111,10 +119,10 @@ public class CmdSession extends ProcessingThread {
 		if(messageResp!=null){			
 			try {
 				connection.send((request.getRespString()+"\n").getBytes());
-				logInfo("-> " + connection.address + "/" + connection.port + ": result:"+ request.result);
+				logInfo("-> " + connection.address + "/" + connection.port + ": result:"+ request.getRespString());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				logInfo("-> " + connection.address + "/" + connection.port + ": result:"+ request.result+"; error:"+e.getMessage());
+				logInfo("-> " + connection.address + "/" + connection.port + ": result:"+ request.getRespString()+"; error:"+e.getMessage());
 			}	
 			OnTerminate();
 		}
@@ -130,15 +138,14 @@ public class CmdSession extends ProcessingThread {
 	public void OnReceive(ByteBuffer buffer){
 		String csReceived = new String(buffer.getBuffer());
 		request = new CmdRequest();
+		request.respFormatType = respFormatType;
 		request.queueResp = queueResp;
 		if(csReceived!=null&&(!csReceived.equals(""))){				
 			csReceived=csReceived.replaceAll("\r\n", "");
 			csReceived=csReceived.replaceAll("\n", "");
 			int pos = csReceived.indexOf(":");
 			if(pos<=0){
-				request.result = new Hashtable<String, String>(resultSyntaxError);
 				request.cmd = csReceived.trim();
-				
 			}
 			else{
 				request.cmd = csReceived.substring(0,pos).trim();
@@ -147,9 +154,12 @@ public class CmdSession extends ProcessingThread {
 					String[] arrString = csReceived.split(",");				
 					for(String property: arrString){
 						if(!property.equals("")){
-							String[] csTemp = property.trim().split("=");
-							if(csTemp.length==2){
+							String[] csTemp = property.trim().split("=",2);
+							if(csTemp.length>=2){
 								request.params.put(csTemp[0].trim(), csTemp[1].trim());
+							}
+							else {
+								request.params.put(csTemp[0].trim(), "");
 							}
 						}
 					}
@@ -160,13 +170,13 @@ public class CmdSession extends ProcessingThread {
 
 		}
 		else {
-			request.result = new Hashtable<String, String>(resultSyntaxError);
+			request.setRespParams(syntaxErrorRespParams);
 			try {
 				connection.send((request.getRespString()+"\n").getBytes());
-				logInfo("-> " + connection.address + "/" + connection.port + ": result:"+ request.result);
+				logInfo("-> " + connection.address + "/" + connection.port + ": result:"+ request.getRespString());
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
-				logInfo("-> " + connection.address + "/" + connection.port + ": result:"+ request.result+"; error:"+e.getMessage());
+				logInfo("-> " + connection.address + "/" + connection.port + ": result:"+ request.getRespString()+"; error:"+e.getMessage());
 			}
 			Terminate();
 			return;
@@ -188,5 +198,10 @@ public class CmdSession extends ProcessingThread {
 				Terminate();
 			}			
 		}	
+	}
+
+	public void setRespFormatType(int respFormatType) {
+		// TODO Auto-generated method stub
+		this.respFormatType = respFormatType;
 	}
 }

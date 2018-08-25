@@ -214,7 +214,7 @@ public abstract class ProcessingThread implements Runnable {
 		}catch(Exception e){
 			if(logger!=null){
 				//e.printStackTrace();
-				String exceptionString = "";
+				String exceptionString = e.getMessage()+"\n";
 				for(StackTraceElement stackTraceElement:e.getStackTrace()){
 					exceptionString+="File:"+stackTraceElement.getFileName()+", Method:"+stackTraceElement.getMethodName()+", Line:"+stackTraceElement.getLineNumber()+"\n";
 				}
@@ -236,7 +236,7 @@ public abstract class ProcessingThread implements Runnable {
 			}catch(Exception e){
 				if(logger!=null){
 					//e.printStackTrace();
-					String exceptionString = "";
+					String exceptionString = e.getMessage()+"\n";
 					for(StackTraceElement stackTraceElement:e.getStackTrace()){
 						exceptionString+="File:"+stackTraceElement.getFileName()+", Method:"+stackTraceElement.getMethodName()+", Line:"+stackTraceElement.getLineNumber()+"\n";
 					}
@@ -254,7 +254,7 @@ public abstract class ProcessingThread implements Runnable {
 				}catch(Exception e){
 					if(logger!=null){
 						//e.printStackTrace();
-						String exceptionString = "";
+						String exceptionString = e.getMessage()+"\n";
 						for(StackTraceElement stackTraceElement:e.getStackTrace()){
 							exceptionString+="File:"+stackTraceElement.getFileName()+", Method:"+stackTraceElement.getMethodName()+", Line:"+stackTraceElement.getLineNumber()+"\n";
 						}

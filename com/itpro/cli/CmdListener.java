@@ -7,7 +7,11 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.util.Hashtable;
+
+import javax.json.Json;
+import javax.json.JsonObject;
+import javax.json.JsonObjectBuilder;
+
 import com.itpro.util.ProcessingThread;
 import com.itpro.util.Queue;
 import com.itpro.util.TCPConnection;
@@ -23,10 +27,53 @@ public class CmdListener extends ProcessingThread {
 	private ServerSocket serverSocket;
 	private int listenPort;
 	private Queue queueReq;
+	private int respFormatType;
 	
+	/*
 	private Hashtable<String, String> resultTimeoutError;
 	private Hashtable<String, String> resultSyntaxError;
+	*/
+	private JsonObject timeoutRespParams;
+	private JsonObject syntaxErrorRespParams;
 	
+	
+	public void setTimeoutRespParams(String timeoutRespParamsString){
+		JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
+		String[] arrString = timeoutRespParamsString.split(",");				
+		for(String property: arrString){
+			if(!property.equals("")){
+				String[] csTemp = property.trim().split("=",2);
+				if(csTemp.length==2){
+					//resultTimeoutError.put(csTemp[0].trim(), csTemp[1].trim());
+					jsonObjectBuilder.add(csTemp[0], csTemp[1]);
+				}
+				else{
+					jsonObjectBuilder.addNull(csTemp[0]);
+				}
+			}
+		}
+		this.timeoutRespParams = jsonObjectBuilder.build();
+	}
+	
+	public void setSyntaxErrorRespParams(String syntaxErrorRespParamsString){
+		JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
+		String[] arrString = syntaxErrorRespParamsString.split(",");				
+		for(String property: arrString){
+			if(!property.equals("")){
+				String[] csTemp = property.trim().split("=",2);
+				if(csTemp.length==2){
+					//resultTimeoutError.put(csTemp[0].trim(), csTemp[1].trim());
+					jsonObjectBuilder.add(csTemp[0], csTemp[1]);
+				}
+				else{
+					jsonObjectBuilder.addNull(csTemp[0]);
+				}
+			}
+		}
+		this.syntaxErrorRespParams = jsonObjectBuilder.build();
+	}
+	
+	/*
 	public void setResultTimeoutError(String timeoutString){
 		resultTimeoutError = new Hashtable<String, String>();
 		String[] arrString = timeoutString.split(",");				
@@ -52,6 +99,7 @@ public class CmdListener extends ProcessingThread {
 			}
 		}
 	}
+	*/
 	
 	public void setRequestTimeout(int requestTimeout){
 		this.requestTimeout = requestTimeout;
@@ -94,8 +142,13 @@ public class CmdListener extends ProcessingThread {
 					cmdSession.setHeartBeatInterval(requestTimeout*1000);
 					cmdSession.setLogger(logger);
 					cmdSession.setQueueReq(queueReq);
+					/*
 					cmdSession.setTimeoutErrorParam(resultTimeoutError);
 					cmdSession.setSyntaxErrorParam(resultSyntaxError);
+					*/
+					cmdSession.setTimeoutRespParams(timeoutRespParams);
+					cmdSession.setSyntaxErrorRespParams(syntaxErrorRespParams);
+					cmdSession.setRespFormatType(respFormatType);
 					cmdSession.start();
 				}
 			}catch(SocketTimeoutException e){
@@ -132,5 +185,10 @@ public class CmdListener extends ProcessingThread {
 			logError("Exception on new ServerSocket: " + e);
 			isListening = false;
 		}
+	}
+
+	public void setRespFormatType(int respFormatType) {
+		// TODO Auto-generated method stub
+		this.respFormatType = respFormatType;
 	}
 }

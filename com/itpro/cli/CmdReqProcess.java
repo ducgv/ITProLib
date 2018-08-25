@@ -15,20 +15,25 @@ public abstract class CmdReqProcess extends ProcessingThread {
 	private Queue queueReq = new Queue();
 	private CmdListener cmdListener;
 	private int requestTimeout;
+	private int respFormatType = CmdRequest.RESP_FORMAT_TYPE_HASH;
 	
-	private String timeoutErrorString = "Result=failed,Error=Request timeout";
-	private String syntaxErrorString = "Result=failed,Error=Syntax error";
+	private String timeoutRespParamsString = "Result=failed,Error=Request timeout";
+	private String syntaxErrorRespParamsString = "Result=failed,Error=Syntax error";
 	
 	public void setTimeoutErrorString(String timeoutString){
-		this.timeoutErrorString = timeoutString;
+		this.timeoutRespParamsString = timeoutString;
 	}
 	
 	public void setSyntaxErrorString(String syntaxString){
-		this.syntaxErrorString = syntaxString;
+		this.syntaxErrorRespParamsString = syntaxString;
 	}
 	
 	public void setRequestTimeout(int requestTimeout){
 		this.requestTimeout = requestTimeout;
+	}
+	
+	public void setRespFormatType(int respFormatType){
+		this.respFormatType = respFormatType;
 	}
 	
 	public void setListenPort(int listenPort){
@@ -52,8 +57,9 @@ public abstract class CmdReqProcess extends ProcessingThread {
 		cmdListener.setQueueReq(queueReq);
 		cmdListener.setLogPrefix(logPrefix);
 		cmdListener.setRequestTimeout(requestTimeout);
-		cmdListener.setResultTimeoutError(timeoutErrorString);
-		cmdListener.setResultSyntaxError(syntaxErrorString);
+		cmdListener.setTimeoutRespParams(timeoutRespParamsString);;
+		cmdListener.setSyntaxErrorRespParams(syntaxErrorRespParamsString);
+		cmdListener.setRespFormatType(respFormatType);
 		cmdListener.start();
 	}
 
