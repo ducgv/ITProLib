@@ -13,9 +13,9 @@ import com.logica.smpp.util.ByteBuffer;
  * @author Giap Van Duc
  *
  */
-public class CmdSession extends ProcessingThread {
+public class CliCmdSession extends ProcessingThread {
 	private TCPConnection connection;
-	private CmdRequest request = null;
+	private CliCmd request = null;
 	private Queue queueResp = null;
 	private Queue queueReq = null;
 	private boolean isReceived = false;
@@ -26,7 +26,7 @@ public class CmdSession extends ProcessingThread {
 	*/
 	private JsonObject timeoutRespParams;
 	private JsonObject syntaxErrorRespParams;
-	private int respFormatType;
+	private int defaultRespFormatType;
 	
 	public void setTimeoutRespParams(JsonObject timeoutRespParams){
 		this.timeoutRespParams = timeoutRespParams;
@@ -40,7 +40,7 @@ public class CmdSession extends ProcessingThread {
 		queueReq = queue;
 	}
 	
-	public CmdSession(TCPConnection connection) {
+	public CliCmdSession(TCPConnection connection) {
 		// TODO Auto-generated constructor stub
 		this.connection = connection;
 		connection.nSendTimeout = 1000;
@@ -70,7 +70,7 @@ public class CmdSession extends ProcessingThread {
 			Terminate();
 		}
 		else{
-			request = new CmdRequest();
+			request = new CliCmd();
 			request.setRespParams(timeoutRespParams);
 			try {
 				connection.send((request.getRespString()+"\n").getBytes());
@@ -115,7 +115,7 @@ public class CmdSession extends ProcessingThread {
 			return;
 		}
 		Receive();
-		CmdRequest messageResp = (CmdRequest)queueResp.dequeue();
+		CliCmd messageResp = (CliCmd)queueResp.dequeue();
 		if(messageResp!=null){			
 			try {
 				connection.send((request.getRespString()+"\n").getBytes());
@@ -129,7 +129,34 @@ public class CmdSession extends ProcessingThread {
 	}
 	
 	public void OnCmdRequest(){
-		logInfo("<- " + connection.address + "/" + connection.port + ": cmd:"+ request.cmd+"; param:"+ request.params);
+		if(request.reqParams.containsKey("CliRespFormatType")){
+			String cmdRespFormat = request.reqParams.get("CLIRespFormatType");
+			if(cmdRespFormat!=null&&cmdRespFormat.equalsIgnoreCase("JSON")){
+				request.respFormatType = CliCmd.RESP_FORMAT_TYPE_JSON;
+			}
+		}
+		if(request.reqParams.containsKey("CliTimeout")){
+			String cliTimeout = request.reqParams.get("CliTimeout");
+			if(cliTimeout!=null&&!cliTimeout.equals("")){
+				try{
+					int timeout = Integer.parseInt(cliTimeout);
+					if(timeout>=1){
+						setHeartBeatInterval(timeout*1000);
+					}
+				}
+				catch(NumberFormatException e){
+					logWarning(request.toString()+"; warning: invalid CliTimeout value, ignore this parameter");
+				}
+
+			}
+		}
+		if(request.reqParams.containsKey("RespFormatType")){
+			String cmdRespFormat = request.reqParams.get("RespFormatType");
+			if(cmdRespFormat!=null&&cmdRespFormat.equalsIgnoreCase("JSON")){
+				request.respFormatType = CliCmd.RESP_FORMAT_TYPE_JSON;
+			}
+		}
+		logInfo("<- " + connection.address + "/" + connection.port + ": cmd:"+ request.cmd+"; param:"+ request.reqParams);
 		if(queueReq!=null){
 			queueReq.enqueue(request);
 		}		
@@ -137,8 +164,8 @@ public class CmdSession extends ProcessingThread {
 	
 	public void OnReceive(ByteBuffer buffer){
 		String csReceived = new String(buffer.getBuffer());
-		request = new CmdRequest();
-		request.respFormatType = respFormatType;
+		request = new CliCmd();
+		request.respFormatType = defaultRespFormatType;
 		request.queueResp = queueResp;
 		if(csReceived!=null&&(!csReceived.equals(""))){				
 			csReceived=csReceived.replaceAll("\r\n", "");
@@ -156,10 +183,10 @@ public class CmdSession extends ProcessingThread {
 						if(!property.equals("")){
 							String[] csTemp = property.trim().split("=",2);
 							if(csTemp.length>=2){
-								request.params.put(csTemp[0].trim(), csTemp[1].trim());
+								request.reqParams.put(csTemp[0].trim(), csTemp[1].trim());
 							}
 							else {
-								request.params.put(csTemp[0].trim(), "");
+								request.reqParams.put(csTemp[0].trim(), "NULL");
 							}
 						}
 					}
@@ -200,8 +227,8 @@ public class CmdSession extends ProcessingThread {
 		}	
 	}
 
-	public void setRespFormatType(int respFormatType) {
+	public void setDefaultRespFormatType(int respFormatType) {
 		// TODO Auto-generated method stub
-		this.respFormatType = respFormatType;
+		this.defaultRespFormatType = respFormatType;
 	}
 }

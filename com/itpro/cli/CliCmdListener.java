@@ -20,14 +20,14 @@ import com.itpro.util.TCPConnection;
  * @author Giap Van Duc
  *
  */
-public class CmdListener extends ProcessingThread {
+public class CliCmdListener extends ProcessingThread {
 	private boolean isListening = false;
 	private boolean needToTerminate = false;
-	private int		requestTimeout;
+	private int		defaultRequestTimeout;
 	private ServerSocket serverSocket;
 	private int listenPort;
 	private Queue queueReq;
-	private int respFormatType;
+	private int defaultRespFormatType;
 	
 	/*
 	private Hashtable<String, String> resultTimeoutError;
@@ -101,15 +101,15 @@ public class CmdListener extends ProcessingThread {
 	}
 	*/
 	
-	public void setRequestTimeout(int requestTimeout){
-		this.requestTimeout = requestTimeout;
+	public void setDefaultRequestTimeout(int requestTimeout){
+		this.defaultRequestTimeout = requestTimeout;
 	}
 	
 	public void setQueueReq(Queue queue){
 		queueReq = queue;
 	}
 	
-	public CmdListener(int listenPort) {
+	public CliCmdListener(int listenPort) {
 		// TODO Auto-generated constructor stub
 		this.listenPort = listenPort;
 	}
@@ -137,9 +137,9 @@ public class CmdListener extends ProcessingThread {
 				if(socket!=null){					
 					TCPConnection newConnection = new TCPConnection(socket);
 					logInfo("Accept new connection from " + newConnection.address + "/" + newConnection.port);
-					CmdSession cmdSession = new CmdSession(newConnection);
+					CliCmdSession cmdSession = new CliCmdSession(newConnection);
 					cmdSession.setLogPrefix(logPrefix);
-					cmdSession.setHeartBeatInterval(requestTimeout*1000);
+					cmdSession.setHeartBeatInterval(defaultRequestTimeout*1000);
 					cmdSession.setLogger(logger);
 					cmdSession.setQueueReq(queueReq);
 					/*
@@ -148,7 +148,7 @@ public class CmdListener extends ProcessingThread {
 					*/
 					cmdSession.setTimeoutRespParams(timeoutRespParams);
 					cmdSession.setSyntaxErrorRespParams(syntaxErrorRespParams);
-					cmdSession.setRespFormatType(respFormatType);
+					cmdSession.setDefaultRespFormatType(defaultRespFormatType);
 					cmdSession.start();
 				}
 			}catch(SocketTimeoutException e){
@@ -187,8 +187,8 @@ public class CmdListener extends ProcessingThread {
 		}
 	}
 
-	public void setRespFormatType(int respFormatType) {
+	public void setDefaultRespFormatType(int respFormatType) {
 		// TODO Auto-generated method stub
-		this.respFormatType = respFormatType;
+		this.defaultRespFormatType = respFormatType;
 	}
 }

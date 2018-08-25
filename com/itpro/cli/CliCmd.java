@@ -18,13 +18,13 @@ import com.itpro.util.Queue;
  * @author Giap Van Duc
  *
  */
-public class CmdRequest {
+public class CliCmd {
 	public static final int RESP_FORMAT_TYPE_HASH = 1;
 	public static final int RESP_FORMAT_TYPE_JSON = 2;
 	public Queue queueResp;
 	public String cmd = "";
 	public int respFormatType = RESP_FORMAT_TYPE_HASH;
-	public Hashtable<String, String> params = new Hashtable<String, String>();
+	public Hashtable<String, String> reqParams = new Hashtable<String, String>();
 	private JsonObject respParams = null;
 	private JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
 	
@@ -38,11 +38,11 @@ public class CmdRequest {
 	
 	public String toString(){
 		String sResult=cmd+":";
-		Enumeration<String> keys = params.keys();		
+		Enumeration<String> keys = reqParams.keys();		
 		String sParam="";		
 		while (keys.hasMoreElements()){
 			String key = keys.nextElement();
-			String value = params.get(key);
+			String value = reqParams.get(key);
 			sParam+=", "+key+"="+value;				
 		}		
 		if(!sParam.equals(""))
@@ -55,12 +55,6 @@ public class CmdRequest {
 		this.respParams = respParams;
 	}
 	public String getRespString(){
-		if(params.containsKey("RespFormatType")){
-			String cmdRespFormat = params.get("RespFormatType");
-			if(cmdRespFormat!=null&&cmdRespFormat.equalsIgnoreCase("JSON")){
-				respFormatType = RESP_FORMAT_TYPE_JSON;
-			}
-		}
 		if(respFormatType == RESP_FORMAT_TYPE_JSON){
 			return Json.createObjectBuilder().add(cmd+"Resp",respParams).build().toString();
 		} else {
@@ -88,7 +82,7 @@ public class CmdRequest {
 			result=result+=","+getPropertyString("", jsonObject, key);
 		}
 		if(result.indexOf(",")==0)
-			result=result.replaceFirst("[,]", "");
+			result=result.substring(1);
 		return result;
 	}
 	

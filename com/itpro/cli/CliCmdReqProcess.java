@@ -10,12 +10,12 @@ import com.itpro.util.Queue;
  * @author Giap Van Duc
  *
  */
-public abstract class CmdReqProcess extends ProcessingThread {
+public abstract class CliCmdReqProcess extends ProcessingThread {
 	private int listenPort;
 	private Queue queueReq = new Queue();
-	private CmdListener cmdListener;
-	private int requestTimeout;
-	private int respFormatType = CmdRequest.RESP_FORMAT_TYPE_HASH;
+	private CliCmdListener cmdListener;
+	private int defaultRequestTimeout;
+	private int defaultRespFormatType = CliCmd.RESP_FORMAT_TYPE_HASH;
 	
 	private String timeoutRespParamsString = "Result=failed,Error=Request timeout";
 	private String syntaxErrorRespParamsString = "Result=failed,Error=Syntax error";
@@ -28,12 +28,12 @@ public abstract class CmdReqProcess extends ProcessingThread {
 		this.syntaxErrorRespParamsString = syntaxString;
 	}
 	
-	public void setRequestTimeout(int requestTimeout){
-		this.requestTimeout = requestTimeout;
+	public void setDefaultRequestTimeout(int requestTimeout){
+		this.defaultRequestTimeout = requestTimeout;
 	}
 	
-	public void setRespFormatType(int respFormatType){
-		this.respFormatType = respFormatType;
+	public void setDefaultRespFormatType(int respFormatType){
+		this.defaultRespFormatType = respFormatType;
 	}
 	
 	public void setListenPort(int listenPort){
@@ -52,14 +52,14 @@ public abstract class CmdReqProcess extends ProcessingThread {
 	@Override
 	protected void initialize() {
 		// TODO Auto-generated method stub
-		cmdListener = new CmdListener(listenPort);
+		cmdListener = new CliCmdListener(listenPort);
 		cmdListener.setLogger(logger);
 		cmdListener.setQueueReq(queueReq);
 		cmdListener.setLogPrefix(logPrefix);
-		cmdListener.setRequestTimeout(requestTimeout);
+		cmdListener.setDefaultRequestTimeout(defaultRequestTimeout);
 		cmdListener.setTimeoutRespParams(timeoutRespParamsString);;
 		cmdListener.setSyntaxErrorRespParams(syntaxErrorRespParamsString);
-		cmdListener.setRespFormatType(respFormatType);
+		cmdListener.setDefaultRespFormatType(defaultRespFormatType);
 		cmdListener.start();
 	}
 
@@ -68,12 +68,12 @@ public abstract class CmdReqProcess extends ProcessingThread {
 	 */
 	@Override
 	protected void process(){
-		CmdRequest cmdRequest = (CmdRequest)queueReq.dequeue();
+		CliCmd cmdRequest = (CliCmd)queueReq.dequeue();
 		if(cmdRequest!=null){
 			OnRequest(cmdRequest);
 		}
 	}
 	
-	protected abstract void OnRequest(CmdRequest cmdRequest);
+	protected abstract void OnRequest(CliCmd cmdRequest);
 	
 }
