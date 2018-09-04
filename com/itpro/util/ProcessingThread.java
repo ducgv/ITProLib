@@ -214,11 +214,7 @@ public abstract class ProcessingThread implements Runnable {
 		}catch(Exception e){
 			if(logger!=null){
 				//e.printStackTrace();
-				String exceptionString = e.getMessage()+"\n";
-				for(StackTraceElement stackTraceElement:e.getStackTrace()){
-					exceptionString+="File:"+stackTraceElement.getFileName()+", Method:"+stackTraceElement.getMethodName()+", Line:"+stackTraceElement.getLineNumber()+"\n";
-				}
-				logger.Error(logPrefix+"initialize: Exception:"+exceptionString);
+				logError("initialize: Exception:"+getExceptionString(e));
 			}
 		}
 		
@@ -236,11 +232,7 @@ public abstract class ProcessingThread implements Runnable {
 			}catch(Exception e){
 				if(logger!=null){
 					//e.printStackTrace();
-					String exceptionString = e.getMessage()+"\n";
-					for(StackTraceElement stackTraceElement:e.getStackTrace()){
-						exceptionString+="File:"+stackTraceElement.getFileName()+", Method:"+stackTraceElement.getMethodName()+", Line:"+stackTraceElement.getLineNumber()+"\n";
-					}
-					logger.Error(logPrefix+"process: Exception:"+exceptionString);
+					logError("process: Exception:"+getExceptionString(e));
 				}
 			}
 			//2009/05/05 ducgv add
@@ -254,11 +246,7 @@ public abstract class ProcessingThread implements Runnable {
 				}catch(Exception e){
 					if(logger!=null){
 						//e.printStackTrace();
-						String exceptionString = e.getMessage()+"\n";
-						for(StackTraceElement stackTraceElement:e.getStackTrace()){
-							exceptionString+="File:"+stackTraceElement.getFileName()+", Method:"+stackTraceElement.getMethodName()+", Line:"+stackTraceElement.getLineNumber()+"\n";
-						}
-						logger.Error(logPrefix+"OnHeartBeat: Exception:"+exceptionString);
+						logError("OnHeartBeat: Exception:"+getExceptionString(e));
 					}
 				}
 			}
@@ -272,7 +260,10 @@ public abstract class ProcessingThread implements Runnable {
 					Thread.sleep(5);
 				}
 				catch(InterruptedException e){
-					e.printStackTrace();
+					//e.printStackTrace();
+					if(logger!=null){
+						logWarning("sleep: Exception:"+getExceptionString(e));
+					}
 				}
 			}
 			//end of ducgv add
@@ -343,5 +334,16 @@ public abstract class ProcessingThread implements Runnable {
 		synchronized (processingStatusLock) {
 			return processingStatus == PROC_RECEIVING;
 		}
+	}
+	
+	/*
+	 * 2018/09/04 ducgv add 
+	 */
+	public static String getExceptionString(Exception e){
+		String exceptionString = e.toString()+"\n";
+		for(StackTraceElement stackTraceElement:e.getStackTrace()){
+			exceptionString+="\t at "+stackTraceElement.getClassName()+"."+stackTraceElement.getMethodName()+"("+stackTraceElement.getFileName()+":"+stackTraceElement.getLineNumber()+")\n";
+		}
+		return exceptionString;
 	}
 }

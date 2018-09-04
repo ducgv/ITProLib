@@ -95,6 +95,11 @@ public abstract class MySQLConnection {
 	}
 	
 	public static String getSQLExceptionString(SQLException e){
-		return "SQLException [ErrorCode:"+e.getErrorCode()+", SQLState:"+e.getSQLState()+", Message:"+e.getMessage()+"]";
+		//return "SQLException [ErrorCode:"+e.getErrorCode()+", SQLState:"+e.getSQLState()+", Message:"+e.getMessage()+"]";
+		String exceptionString = e.toString()+"\n";
+		for(StackTraceElement stackTraceElement:e.getStackTrace()){
+			exceptionString+="\t at "+stackTraceElement.getClassName()+"."+stackTraceElement.getMethodName()+"("+stackTraceElement.getFileName()+":"+stackTraceElement.getLineNumber()+")\n";
+		}
+		return exceptionString;
 	}
 }
