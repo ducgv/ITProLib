@@ -11,7 +11,6 @@ import java.net.SocketTimeoutException;
 import javax.json.Json;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
-
 import com.itpro.util.ProcessingThread;
 import com.itpro.util.Queue;
 import com.itpro.util.TCPConnection;

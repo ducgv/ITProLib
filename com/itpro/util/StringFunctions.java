@@ -9,7 +9,7 @@ import java.io.UnsupportedEncodingException;
  * @author Giap Van Duc
  *
  */
-public class StringFunction {
+public class StringFunctions {
 	
 	static final byte[] hex = {
 		(byte)'0', (byte)'1', (byte)'2', (byte)'3',
@@ -73,5 +73,9 @@ public class StringFunction {
 				return false;
 		}
 		return true;
+	}
+	
+	public static String getNumberString(int number){
+		return String.format("%,d", number);
 	}
 }

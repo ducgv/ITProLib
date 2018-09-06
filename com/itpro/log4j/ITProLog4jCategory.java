@@ -9,7 +9,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
-
 import com.itpro.util.ProcessingThread;
 import com.itpro.util.Queue;
 
@@ -284,5 +283,4 @@ public class ITProLog4jCategory extends ProcessingThread {
 			}
 		}
 	}
-
 }

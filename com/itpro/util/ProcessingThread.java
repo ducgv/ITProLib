@@ -37,6 +37,7 @@ public abstract class ProcessingThread implements Runnable {
 	/*2011/05/11 ducgv add*/
 	protected ITProLog4jCategory logger = null;
 	protected String logPrefix = "";
+	//end of ducgv add
 	
 	public void setLogger(ITProLog4jCategory logger){
 		this.logger = logger;
@@ -270,7 +271,7 @@ public abstract class ProcessingThread implements Runnable {
 		}
 		setProcessingStatus(PROC_FINISHED);		
 	}
-
+	
 	//2009/05/18 ducgv add
 	protected void DoNotSleep(){
 		needToSleep = false;
@@ -346,4 +347,5 @@ public abstract class ProcessingThread implements Runnable {
 		}
 		return exceptionString;
 	}
+	//end of ducgv add
 }
