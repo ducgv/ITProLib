@@ -1,7 +1,7 @@
 /**
  * 
  */
-package com.itpro.util;
+package com.itpro.util.monitor;
 
 import com.itpro.util.ProcessingThread;
 import com.itpro.util.Queue;
@@ -24,4 +24,21 @@ public abstract class ProcessingThreadWithStatus extends ProcessingThread{
 			OnQueryThreadStatusReq(cmdQueryThreadStatusReq);
 		}
 	}
+	
+	public void addThreadRuningStatus(CmdQueryThreadStatus cmdQueryThreadStatus){
+		cmdQueryThreadStatus.getThreadStatusInfoBuilder().add(CmdQueryThreadStatus.THREAD_STATUS, CmdQueryThreadStatus.STATUS_OK);
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.itpro.util.ProcessingThread#process()
+	 */
+	@Override
+	protected void process() {
+		checkQueueQueryThreadStatusReq();
+		processEx();
+	}
+
+	protected abstract void processEx();
 }

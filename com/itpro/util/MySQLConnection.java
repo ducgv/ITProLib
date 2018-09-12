@@ -5,11 +5,16 @@ package com.itpro.util;
 
 import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Enumeration;
 import java.util.Hashtable;
+
+import com.itpro.util.monitor.MessagesStatisticsRecord;
 
 /**
  * @author Giap Van Duc
@@ -101,5 +106,34 @@ public abstract class MySQLConnection {
 			exceptionString+="\t at "+stackTraceElement.getClassName()+"."+stackTraceElement.getMethodName()+"("+stackTraceElement.getFileName()+":"+stackTraceElement.getLineNumber()+")\n";
 		}
 		return exceptionString;
+	}
+	
+	public void insertMessagesStatisticsRecord(MessagesStatisticsRecord statisticsMessageInfo) throws SQLException{
+		PreparedStatement ps = null;		
+		
+		String sql = "INSERT INTO "+statisticsMessageInfo.dbTableName+ 
+				"(date_time, module_name, message_name";
+		Enumeration<String> colums = statisticsMessageInfo.messageFields.keys();
+		
+		String fieldsValue="";
+		
+		while(colums.hasMoreElements()){
+			String colum = colums.nextElement();
+			sql += ","+colum;
+			Object value=statisticsMessageInfo.messageFields.get(colum);
+			if (value instanceof String || value instanceof Timestamp || value instanceof Date ) {
+				fieldsValue +=",'"+value.toString()+"'";
+				
+			}
+			else {
+				fieldsValue +=","+value.toString();
+				
+			}
+		}
+		sql+=") VALUES ('"+statisticsMessageInfo.dateTime.toString()+"','"+statisticsMessageInfo.moduleName+"','"+statisticsMessageInfo.messageName+"'"+fieldsValue+")";
+		
+		ps=connection.prepareStatement(sql);	
+		ps.execute();
+		ps.close();
 	}
 }
