@@ -18,7 +18,7 @@ import com.itpro.util.Queue;
  * @author ducgv
  *
  */
-public class CheckModuleStatusProcess extends ProcessingThread {
+public class CliCmdCheckModuleStatusProcess extends ProcessingThread {
 	public Queue queueCliCmdReq = new Queue();
 	private Queue queueQueryThreadStatusResp = null;
 	private Hashtable<String, CmdQueryThreadStatus> listWaitingResp = null;
