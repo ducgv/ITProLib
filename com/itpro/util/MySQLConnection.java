@@ -112,25 +112,25 @@ public abstract class MySQLConnection {
 		PreparedStatement ps = null;		
 		
 		String sql = "INSERT INTO "+statisticsMessageInfo.dbTableName+ 
-				"(date_time, module_name, message_name";
-		Enumeration<String> colums = statisticsMessageInfo.messageFields.keys();
+				"(date_time, module_name, message_type";
+		Enumeration<String> fields = statisticsMessageInfo.messageInfo.keys();
 		
-		String fieldsValue="";
+		String values="";
 		
-		while(colums.hasMoreElements()){
-			String colum = colums.nextElement();
-			sql += ","+colum;
-			Object value=statisticsMessageInfo.messageFields.get(colum);
+		while(fields.hasMoreElements()){
+			String field = fields.nextElement();
+			sql += ","+field;
+			Object value=statisticsMessageInfo.messageInfo.get(field);
 			if (value instanceof String || value instanceof Timestamp || value instanceof Date ) {
-				fieldsValue +=",'"+value.toString()+"'";
+				values +=",'"+value.toString()+"'";
 				
 			}
 			else {
-				fieldsValue +=","+value.toString();
+				values +=","+value.toString();
 				
 			}
 		}
-		sql+=") VALUES ('"+statisticsMessageInfo.dateTime.toString()+"','"+statisticsMessageInfo.moduleName+"','"+statisticsMessageInfo.messageName+"'"+fieldsValue+")";
+		sql+=") VALUES ('"+statisticsMessageInfo.date_time.toString()+"','"+statisticsMessageInfo.module_name+"','"+statisticsMessageInfo.message_type+"'"+values+")";
 		
 		ps=connection.prepareStatement(sql);	
 		ps.execute();

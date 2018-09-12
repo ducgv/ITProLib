@@ -5,8 +5,8 @@ import java.util.Hashtable;
 
 public class MessagesStatisticsRecord {
 	public String dbTableName;
-	public Timestamp dateTime;
-	public String moduleName;
-	public String messageName;
-	public Hashtable<String, Object> messageFields = new Hashtable<String, Object>();
+	public Timestamp date_time;
+	public String module_name;
+	public String message_type;
+	public Hashtable<String, Object> messageInfo = new Hashtable<String, Object>();
 }
