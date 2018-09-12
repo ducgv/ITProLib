@@ -25,10 +25,6 @@ public abstract class ProcessingThreadWithStatus extends ProcessingThread{
 		}
 	}
 	
-	public void addThreadRuningStatus(CmdQueryThreadStatus cmdQueryThreadStatus){
-		cmdQueryThreadStatus.getThreadStatusInfoBuilder().add(CmdQueryThreadStatus.THREAD_STATUS, CmdQueryThreadStatus.STATUS_OK);
-	}
-	
 	/*
 	 * (non-Javadoc)
 	 * 

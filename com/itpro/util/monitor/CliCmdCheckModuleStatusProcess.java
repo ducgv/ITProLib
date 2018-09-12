@@ -107,7 +107,7 @@ public class CliCmdCheckModuleStatusProcess extends ProcessingThread {
 		// TODO Auto-generated method stub
 		JsonObjectBuilder jsonObjectBuilder = currentCliCmd.getJsonObjectBuilder();
 		Enumeration<String> keys = listChecking.keys();
-		JsonObject jsonObjectNoRespValue = Json.createObjectBuilder().add(CmdQueryThreadStatus.THREAD_STATUS, CmdQueryThreadStatus.STATUS_FAILED).build();
+		JsonObject jsonObjectNoRespValue = Json.createObjectBuilder().add(CmdQueryThreadStatus.FIELD_THREAD_RUNNING_STATUS, CmdQueryThreadStatus.STATUS_FAIL).build();
 		while(keys.hasMoreElements()){
 			String key = keys.nextElement();
 			Object value = listChecking.get(key);

@@ -4,8 +4,6 @@
 package com.itpro.util.monitor;
 
 import java.sql.SQLException;
-
-import javax.json.Json;
 import javax.json.JsonObjectBuilder;
 import com.itpro.util.MySQLConnection;
 import com.itpro.util.Queue;
@@ -85,22 +83,22 @@ public class MessagesStatisticsUpdater extends ProcessingThreadWithStatus {
 	@Override
 	protected void OnQueryThreadStatusReq(CmdQueryThreadStatus cmdQueryThreadStatusReq) {
 		// TODO Auto-generated method stub
-		JsonObjectBuilder jsonObjectBuilder = Json.createObjectBuilder();
-		jsonObjectBuilder.add(CmdQueryThreadStatus.THREAD_STATUS, CmdQueryThreadStatus.STATUS_OK);
+		JsonObjectBuilder jsonObjectBuilder = cmdQueryThreadStatusReq.getJsonObjectBuilder();
+		jsonObjectBuilder.add(CmdQueryThreadStatus.FIELD_THREAD_RUNNING_STATUS, CmdQueryThreadStatus.STATUS_OK);
 		if(!isConnected){
-			jsonObjectBuilder.add(CmdQueryThreadStatus.DB_CONNECTION_STATUS, CmdQueryThreadStatus.STATUS_FAILED);
+			jsonObjectBuilder.add(CmdQueryThreadStatus.FIELD_DB_CONNECTION_STATUS, CmdQueryThreadStatus.STATUS_FAIL);
 		}
 		else{
 			try {
 				connection.checkConnection();
-				jsonObjectBuilder.add(CmdQueryThreadStatus.DB_CONNECTION_STATUS, CmdQueryThreadStatus.STATUS_OK);
+				jsonObjectBuilder.add(CmdQueryThreadStatus.FIELD_DB_CONNECTION_STATUS, CmdQueryThreadStatus.STATUS_OK);
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				logError(getExceptionString(e));
-				jsonObjectBuilder.add(CmdQueryThreadStatus.DB_CONNECTION_STATUS, CmdQueryThreadStatus.STATUS_FAILED);
+				jsonObjectBuilder.add(CmdQueryThreadStatus.FIELD_DB_CONNECTION_STATUS, CmdQueryThreadStatus.STATUS_FAIL);
 			}
 		}
-		cmdQueryThreadStatusReq.threadStatusInfo = jsonObjectBuilder.build();
+		cmdQueryThreadStatusReq.apply();
 		cmdQueryThreadStatusReq.doResponse();
 	}
 
