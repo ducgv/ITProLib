@@ -112,25 +112,27 @@ public abstract class MySQLConnection {
 		PreparedStatement ps = null;		
 		
 		String sql = "INSERT INTO "+statisticsMessageInfo.dbTableName+ 
-				"(date_time, module_name, message_type";
+				"(";
 		Enumeration<String> fields = statisticsMessageInfo.messageInfo.keys();
-		
-		String values="";
+		String sqlFields = "";
+		String sqlValues="";
 		
 		while(fields.hasMoreElements()){
 			String field = fields.nextElement();
-			sql += ","+field;
+			sqlFields += ","+field;
 			Object value=statisticsMessageInfo.messageInfo.get(field);
 			if (value instanceof String || value instanceof Timestamp || value instanceof Date ) {
-				values +=",'"+value.toString()+"'";
+				sqlValues +=",'"+value.toString()+"'";
 				
 			}
 			else {
-				values +=","+value.toString();
+				sqlValues +=","+value.toString();
 				
 			}
 		}
-		sql+=") VALUES ('"+statisticsMessageInfo.date_time.toString()+"','"+statisticsMessageInfo.module_name+"','"+statisticsMessageInfo.message_type+"'"+values+")";
+		sqlFields = sqlFields.substring(1);
+		sqlValues = sqlValues.substring(1);
+		sql+=sqlFields+") VALUES ("+sqlValues+")";
 		
 		ps=connection.prepareStatement(sql);	
 		ps.execute();

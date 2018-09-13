@@ -127,10 +127,10 @@ public class CliCmdCheckModuleStatusProcess extends ProcessingThread {
 				for(CmdQueryThreadStatus cmdQueryThreadStatusWaitResp: cmdQueryThreadStatusWaitResps){
 					if(cmdQueryThreadStatusWaitResp.threadStatusInfo!=null){
 						
-						jsonArray.add(Json.createObjectBuilder().add(cmdQueryThreadStatusWaitResp.threadName, cmdQueryThreadStatusWaitResp.threadStatusInfo));
+						jsonArray.add(cmdQueryThreadStatusWaitResp.threadStatusInfo);
 					}
 					else{
-						jsonArray.add(Json.createObjectBuilder().add(cmdQueryThreadStatusWaitResp.threadName, jsonObjectNoRespValue));
+						jsonArray.add(jsonObjectNoRespValue);
 					}
 					cmdQueryThreadStatusWaitResp.threadStatusInfo = null;
 				}
