@@ -78,4 +78,12 @@ public class StringFunctions {
 	public static String getNumberString(int number){
 		return String.format("%,d", number);
 	}
+	
+	public static String getExceptionString(Exception e){
+		String exceptionString = e.toString()+"\n";
+		for(StackTraceElement stackTraceElement:e.getStackTrace()){
+			exceptionString+="\t at "+stackTraceElement.getClassName()+"."+stackTraceElement.getMethodName()+"("+stackTraceElement.getFileName()+":"+stackTraceElement.getLineNumber()+")\n";
+		}
+		return exceptionString;
+	}
 }

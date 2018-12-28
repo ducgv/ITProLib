@@ -99,27 +99,18 @@ public abstract class MySQLConnection {
 		}	
 	}
 	
-	public static String getSQLExceptionString(SQLException e){
-		//return "SQLException [ErrorCode:"+e.getErrorCode()+", SQLState:"+e.getSQLState()+", Message:"+e.getMessage()+"]";
-		String exceptionString = e.toString()+"\n";
-		for(StackTraceElement stackTraceElement:e.getStackTrace()){
-			exceptionString+="\t at "+stackTraceElement.getClassName()+"."+stackTraceElement.getMethodName()+"("+stackTraceElement.getFileName()+":"+stackTraceElement.getLineNumber()+")\n";
-		}
-		return exceptionString;
-	}
-	
 	public void insertMessagesStatisticsRecord(MessagesStatisticsRecord statisticsMessageInfo) throws SQLException{
 		PreparedStatement ps = null;		
 		
-		String sql = "INSERT INTO "+statisticsMessageInfo.dbTableName+ 
-				"(";
+		String sql = "INSERT INTO `"+statisticsMessageInfo.dbTableName+ 
+				"`(";
 		Enumeration<String> fields = statisticsMessageInfo.messageInfo.keys();
 		String sqlFields = "";
 		String sqlValues="";
 		
 		while(fields.hasMoreElements()){
 			String field = fields.nextElement();
-			sqlFields += ","+field;
+			sqlFields += ",`"+field+"`";
 			Object value=statisticsMessageInfo.messageInfo.get(field);
 			if (value instanceof String || value instanceof Timestamp || value instanceof Date ) {
 				sqlValues +=",'"+value.toString()+"'";
@@ -137,5 +128,9 @@ public abstract class MySQLConnection {
 		ps=connection.prepareStatement(sql);	
 		ps.execute();
 		ps.close();
+	}
+	
+	public static String getExceptionString(Exception e){
+		return StringFunctions.getExceptionString(e);
 	}
 }

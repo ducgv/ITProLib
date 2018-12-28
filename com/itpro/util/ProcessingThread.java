@@ -215,7 +215,7 @@ public abstract class ProcessingThread implements Runnable {
 		}catch(Exception e){
 			if(logger!=null){
 				//e.printStackTrace();
-				logError("initialize: Exception:"+getExceptionString(e));
+				logError("initialize: Exception:"+StringFunctions.getExceptionString(e));
 			}
 		}
 		
@@ -233,7 +233,7 @@ public abstract class ProcessingThread implements Runnable {
 			}catch(Exception e){
 				if(logger!=null){
 					//e.printStackTrace();
-					logError("process: Exception:"+getExceptionString(e));
+					logError("process: Exception:"+StringFunctions.getExceptionString(e));
 				}
 			}
 			//2009/05/05 ducgv add
@@ -247,7 +247,7 @@ public abstract class ProcessingThread implements Runnable {
 				}catch(Exception e){
 					if(logger!=null){
 						//e.printStackTrace();
-						logError("OnHeartBeat: Exception:"+getExceptionString(e));
+						logError("OnHeartBeat: Exception:"+StringFunctions.getExceptionString(e));
 					}
 				}
 			}
@@ -263,7 +263,7 @@ public abstract class ProcessingThread implements Runnable {
 				catch(InterruptedException e){
 					//e.printStackTrace();
 					if(logger!=null){
-						logWarning("sleep: Exception:"+getExceptionString(e));
+						logWarning("sleep: Exception:"+StringFunctions.getExceptionString(e));
 					}
 				}
 			}
@@ -337,15 +337,7 @@ public abstract class ProcessingThread implements Runnable {
 		}
 	}
 	
-	/*
-	 * 2018/09/04 ducgv add 
-	 */
 	public static String getExceptionString(Exception e){
-		String exceptionString = e.toString()+"\n";
-		for(StackTraceElement stackTraceElement:e.getStackTrace()){
-			exceptionString+="\t at "+stackTraceElement.getClassName()+"."+stackTraceElement.getMethodName()+"("+stackTraceElement.getFileName()+":"+stackTraceElement.getLineNumber()+")\n";
-		}
-		return exceptionString;
+		return StringFunctions.getExceptionString(e);
 	}
-	//end of ducgv add
 }

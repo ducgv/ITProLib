@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import javax.json.JsonObjectBuilder;
 import com.itpro.util.MySQLConnection;
 import com.itpro.util.Queue;
+import com.itpro.util.StringFunctions;
 
 /**
  * @author Giap Van Duc
@@ -45,7 +46,7 @@ public class MessagesStatisticsUpdater extends ProcessingThreadWithStatus {
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
 				//e.printStackTrace();
-				logError("Exception when check DB connection:"+getExceptionString(e));
+				logError("Exception when check DB connection:"+StringFunctions.getExceptionString(e));
 				isConnected = false;
 			}
 		}
@@ -64,7 +65,7 @@ public class MessagesStatisticsUpdater extends ProcessingThreadWithStatus {
 			OnConnected();
 		} catch (Exception e) {
 			isConnected = false;
-			logError("Exception when connect to DB:" + getExceptionString(e));
+			logError("Exception when connect to DB:" + StringFunctions.getExceptionString(e));
 		}
 	}
 
@@ -94,7 +95,7 @@ public class MessagesStatisticsUpdater extends ProcessingThreadWithStatus {
 				jsonObjectBuilder.add(CmdQueryThreadStatus.FIELD_DB_CONNECTION_STATUS, CmdQueryThreadStatus.STATUS_OK);
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
-				logError(getExceptionString(e));
+				logError(StringFunctions.getExceptionString(e));
 				jsonObjectBuilder.add(CmdQueryThreadStatus.FIELD_DB_CONNECTION_STATUS, CmdQueryThreadStatus.STATUS_FAIL);
 			}
 		}
@@ -114,7 +115,7 @@ public class MessagesStatisticsUpdater extends ProcessingThreadWithStatus {
 				logInfo(messagesStatisticsRecord.toString());
 			} catch (SQLException e) {
 				// TODO Auto-generated catch block
-				logError(messagesStatisticsRecord.toString()+ "; Exception:" + getExceptionString(e));
+				logError(messagesStatisticsRecord.toString()+ "; Exception:" + StringFunctions.getExceptionString(e));
 				queueInsertMessagesStatisticsRecordReq.enqueue(messagesStatisticsRecord);
 				isConnected = false;
 			}
